@@ -153,7 +153,7 @@ extern void hash_match_group_list(const hash_match_t *start, const hash_match_t 
     {                                               \
         extern const int GROUP##_start;             \
         extern const int GROUP##_end;               \
-        hash_match_group((const hash_match_t*)&GROUP##_start, (const hash_match_t*)&GROUP##_end, (uint8_t *)SRC, LEN, PARAMS);    \
+        hash_match_group((const hash_match_t*)&GROUP##_start, (const hash_match_t*)&GROUP##_end, SRC, LEN, PARAMS);    \
     } while(0)
 
 #define HASH_MATCH_LIST(GROUP)  do          \
