@@ -41,8 +41,8 @@
     #define hash_match_memcmp       memcmp
     #define HASH_MATCH_MEMCMP_SAME  0
 #else
-    #define hash_match_memcmp
-    #define HASH_MATCH_MEMCMP_SAME
+    #define hash_match_memcmp       murmurhash3_lower_char_upper_memcmp
+    #define HASH_MATCH_MEMCMP_SAME  0
 #endif
 
 typedef void (*hash_match_handler)(void *);

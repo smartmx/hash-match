@@ -10,7 +10,7 @@
 
 但是一旦工程量变大，运行速度下降明显。比如有200个数据数组等待比较，每次都要比较很多次。
 
-经常可以看到有的工程里`switch`里面有上百个`case strcmp():`，极度影响代码运行效率。
+经常可以看到有的工程里`if(memcmp()) {}`后边有上百个`else if(memcmp()) {}`，极度影响代码运行效率。
 
 此时，将key的数组特征化，计算出特有的hash值，来代替比较，就可以给运行速度带来很大的提升。
 
@@ -98,7 +98,7 @@ PROVIDE(hash_match_test_end = .);
 . = ALIGN(4);
 ```
 
-例如：
+例如，提供的例程中就可以将ld文件修改如下：
 
 ```ld
 .text :
@@ -121,6 +121,12 @@ PROVIDE(hash_match_test_end = .);
     PROVIDE(hash_match_test_end = .);
     . = ALIGN(4);
 
+    /* this is for GROUP hash_match_test1 of hash_match library. */
+    PROVIDE(hash_match_test1_start = .);
+    KEEP(*(hash_match_test))
+    PROVIDE(hash_match_test1_end = .);
+    . = ALIGN(4);
+
 } >FLASH AT>FLASH 
 ```
 
@@ -131,10 +137,6 @@ PROVIDE(hash_match_test_end = .);
 配置选项可以在`hash-match.h`中修改
 
 ```c
-/*
- * @Note: hash-match use murmur3 hash algorithm in default: https://github.com/aappleby/smhasher.
- *        you can use your own hash algorithm by change the definition "hash_match_caculate".
- */
 #define hash_match_caculate         murmurhash3_caculate32
 
 /* whether save description of hash source or not, set 0 will not save description. */
@@ -170,9 +172,47 @@ PROVIDE(hash_match_test_end = .);
 
 `HASH_MATCH_PRINTF`宏定义是在有报错信息时候调用的打印函数。
 
-`HASH_MATCH_COMPARE_KEY`宏定义决定了在哈希值匹配成功后，是否继续匹配数据内容。一般来说，长度一样的数据内容，哈希值一样的概率小的微乎其微，所以可以根据安全性要求来决定是否继续匹配数据内容。
+`HASH_MATCH_COMPARE_KEY`宏定义决定了在哈希值匹配成功后，是否继续匹配数据内容。一般来说，长度一样的数据内容，哈希值一样的概率很小，所以可以根据安全性要求来决定是否继续匹配数据内容。
 
 `HASH_MATCH_USE_STRING_H`宏定义决定了匹配数据内容使用的函数，如果不准备使用，可以改为其他函数。
+
+## 大小写通用匹配
+
+`hash-match.c`中并未直接处理大小写可以通用的转换，需要在hash计算的函数中处理。
+
+目前在`murmurhash3.c`中提供了转换大小写的处理函数，如需使用，需要把配置项改为如下：
+
+```c
+#define hash_match_caculate         murmurhash3_upper_caculate32
+
+/* whether save description of hash source or not, set 0 will not save description. */
+#define HASH_MATCH_SAVE_DESC        0
+
+/* set HASH_MATCH_INIT_CHECK to 1 will check all hash values in one group during init a group, report if some hash value is duplicated. */
+#define HASH_MATCH_INIT_CHECK       0
+
+/* change to your own printf function, or don't use it. */
+#define HASH_MATCH_PRINTF           printf
+
+/* whether compare key when hash_code is same. */
+#define HASH_MATCH_COMPARE_KEY      1
+
+/* use string.h or self functions to compare key. */
+#define HASH_MATCH_USE_STRING_H     0
+
+#if HASH_MATCH_USE_STRING_H
+    #include "string.h"
+    #define hash_match_memcmp       memcmp
+    #define HASH_MATCH_MEMCMP_SAME  0
+#else
+    #define hash_match_memcmp       murmurhash3_lower_char_upper_memcmp
+    #define HASH_MATCH_MEMCMP_SAME  0
+#endif
+```
+
+`murmurhash3_upper_caculate32`函数会将小写字母转换为大写字母再进行哈希值计算
+
+`murmurhash3_lower_char_upper_memcmp`函数会将小写字母转换为大写字母后再比较是否相同
 
 ## 注意事项
 

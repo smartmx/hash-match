@@ -33,4 +33,8 @@
 
 extern uint32_t murmurhash3_caculate32(const void *hash_key, uint32_t len);
 
+extern uint32_t murmurhash3_upper_caculate32(const void *hash_key, uint32_t len);
+
+extern uint8_t murmurhash3_lower_char_upper_memcmp(const void *src1, const void *src2, uint32_t len);
+
 #endif /* _MURMURHASH3_H_ */

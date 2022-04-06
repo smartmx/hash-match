@@ -16,7 +16,9 @@ void hash_match_test1func(void *t)
 {
     rt_kprintf("test1\n");
 }
-const uint8_t hash_match_test1key[] = {251, 35, 0, 189, 76, 32, 232, 16, 168, 192};
+const uint8_t hash_match_test1key[] = {'a', 'b', 'c', 'd', 'e', 'f', 232, 'g', 168, 192};
+/* test upper and lower compare. */
+const uint8_t hash_match_test1keyu[] = {'A', 'B', 'C', 'd', 'e', 'f', 232, 'g', 168, 192};
 HASH_MATCH_EXPORT(hash_match_test, hash_match_test1, hash_match_test1key, sizeof(hash_match_test1key), hash_match_test1func, "this is test 1");
 
 /* different section group with same key, for test. */
@@ -70,6 +72,8 @@ static void hash_match_test_task(void *arg)
         HASH_MATCH(hash_match_test, hash_match_test1key, sizeof(hash_match_test1key), NULL);
         HASH_MATCH(hash_match_test, hash_match_test2key, sizeof(hash_match_test2key), NULL);
         HASH_MATCH(hash_match_test, hash_match_test3key, sizeof(hash_match_test3key), NULL);
+        /* test upper and lower compare. */
+        HASH_MATCH(hash_match_test, hash_match_test1keyu, sizeof(hash_match_test1keyu), NULL);
         /* mix up the length, to try. */
         HASH_MATCH(hash_match_test, hash_match_test1key, sizeof(hash_match_test2key), NULL);
         HASH_MATCH(hash_match_test, hash_match_test2key, sizeof(hash_match_test3key), NULL);
