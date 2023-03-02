@@ -1,11 +1,12 @@
 /*
- * Copyright (c) 2022, smartmx <smartmx@qq.com>
+ * Copyright (c) 2022-2023, smartmx <smartmx@qq.com>
  *
  * SPDX-License-Identifier: Apache-2.0
  *
  * Change Logs:
  * Date           Author       Notes
  * 2022-04-03     smartmx      the first version
+ * 2023-03-02     smartmx      hash_match_group function will return the pointer to index
  *
  */
 #include "hash-match.h"
@@ -75,7 +76,7 @@ void hash_match_group_init(const hash_match_t *start, const hash_match_t *end)
  *
  * @return None.
  */
-void hash_match_group(const hash_match_t *start, const hash_match_t *end, const void *src, uint32_t len, void *param)
+void* hash_match_group(const hash_match_t *start, const hash_match_t *end, const void *src, uint32_t len, void *param)
 {
     const hash_match_t *find_start = (const hash_match_t *)start;
     uint32_t hash_code;
@@ -96,13 +97,14 @@ void hash_match_group(const hash_match_t *start, const hash_match_t *end, const 
                 {
                     find_start->handler(param);
                 }
-                break;
+                return find_start;
 #if HASH_MATCH_COMPARE_KEY
             }
 #endif
         }
         find_start++;
     }
+    return NULL;
 }
 
 /**

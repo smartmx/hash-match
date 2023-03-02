@@ -1,11 +1,12 @@
 /*
- * Copyright (c) 2022, smartmx <smartmx@qq.com>
+ * Copyright (c) 2022-2023, smartmx <smartmx@qq.com>
  *
  * SPDX-License-Identifier: Apache-2.0
  *
  * Change Logs:
  * Date           Author       Notes
  * 2022-04-03     smartmx      the first version
+ * 2023-03-02     smartmx      add HASH_MATCH_NO_FOUND_ACTION api
  *
  */
 #ifndef _HASH_MACTH_H_
@@ -110,6 +111,16 @@ extern void hash_match_group_list(const hash_match_t *start, const hash_match_t 
         hash_match_group((const hash_match_t*)&GROUP##$$Base, (const hash_match_t*)&GROUP##$$Limit, SRC, LEN, PARAMS); \
     } while(0)
 
+#define HASH_MATCH_NO_FOUND_ACTION(GROUP, SRC, LEN, PARAMS, NO_FOUND_ACTION)    do       \
+    {                                                   \
+        extern const int GROUP##$$Base;                 \
+        extern const int GROUP##$$Limit;                \
+        if(hash_match_group((const hash_match_t*)&GROUP##$$Base, (const hash_match_t*)&GROUP##$$Limit, SRC, LEN, PARAMS) == NULL) \
+        {                                               \
+            NO_FOUND_ACTION;                            \
+        }                                               \
+    } while(0)
+
 #define HASH_MATCH_LIST(GROUP)  do          \
     {                                       \
         extern const int GROUP##$$Base;     \
@@ -130,6 +141,14 @@ extern void hash_match_group_list(const hash_match_t *start, const hash_match_t 
 #define HASH_MATCH(GROUP, SRC, LEN, PARAMS)    do   \
     {                                               \
         hash_match_group((const hash_match_t*)(__section_begin(#GROUP)), (const hash_match_t*)(__section_end(#GROUP)), SRC, LEN, PARAMS); \
+    } while(0)
+
+#define HASH_MATCH_NO_FOUND_ACTION(GROUP, SRC, LEN, PARAMS, NO_FOUND_ACTION)    do   \
+    {                                               \
+        if(hash_match_group((const hash_match_t*)(__section_begin(#GROUP)), (const hash_match_t*)(__section_end(#GROUP)), SRC, LEN, PARAMS) == NULL) \
+        {                                           \
+            NO_FOUND_ACTION;                        \
+        }                                           \
     } while(0)
 
 #define HASH_MATCH_LIST(GROUP)  do              \
@@ -154,6 +173,16 @@ extern void hash_match_group_list(const hash_match_t *start, const hash_match_t 
         extern const int GROUP##_start;             \
         extern const int GROUP##_end;               \
         hash_match_group((const hash_match_t*)&GROUP##_start, (const hash_match_t*)&GROUP##_end, SRC, LEN, PARAMS);    \
+    } while(0)
+
+#define HASH_MATCH_NO_FOUND_ACTION(GROUP, SRC, LEN, PARAMS, NO_FOUND_ACTION)    do   \
+    {                                               \
+        extern const int GROUP##_start;             \
+        extern const int GROUP##_end;               \
+        if(hash_match_group((const hash_match_t*)&GROUP##_start, (const hash_match_t*)&GROUP##_end, SRC, LEN, PARAMS)== NULL)    \
+        {                                           \
+            NO_FOUND_ACTION;                        \
+        }                                           \
     } while(0)
 
 #define HASH_MATCH_LIST(GROUP)  do          \
