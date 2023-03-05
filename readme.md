@@ -244,6 +244,6 @@ RT-Thread online packages  --->
 
 hash-match 遵循 Apache License v2.0 开源协议。
 
-欢迎大家提交PR时将自己的版权信息添加到文件头部，并且在change log中附上自己的修改日志。
+欢迎大家提交PR，并在change log中附上自己的修改日志。
 
 ## [博客主页](https://blog.maxiang.vip/)
