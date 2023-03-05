@@ -15,6 +15,7 @@
 #include "stdio.h"
 #include "stdint.h"
 #include "murmurhash3.h"
+#include "simplehash.h"
 
 /*
  * @Note: hash-match use murmur3 hash algorithm in default: https://github.com/aappleby/smhasher.
@@ -38,12 +39,12 @@
 #define HASH_MATCH_USE_STRING_H     1
 
 #if HASH_MATCH_USE_STRING_H
-    #include "string.h"
-    #define hash_match_memcmp       memcmp
-    #define HASH_MATCH_MEMCMP_SAME  0
+#include "string.h"
+#define hash_match_memcmp       memcmp
+#define HASH_MATCH_MEMCMP_SAME  0
 #else
-    #define hash_match_memcmp       murmurhash3_lower_char_upper_memcmp
-    #define HASH_MATCH_MEMCMP_SAME  0
+#define hash_match_memcmp       murmurhash3_lower_char_upper_memcmp
+#define HASH_MATCH_MEMCMP_SAME  0
 #endif
 
 typedef void (*hash_match_handler)(void *);
@@ -64,30 +65,30 @@ typedef struct _hash_match_struct
     static const char NAME##_hash_desc[] = hash_desc;                                       \
     static uint32_t NAME##_hash_code = 0;                                                   \
     HASH_MATCH_USED const hash_match_t NAME HASH_MATCH_SECTION(#GROUP)=                     \
-    {                                                                                       \
-        hash_key_src,                                                                       \
-        hash_key_len,                                                                       \
-        &NAME##_hash_code,                                                                  \
-        &handler,                                                                           \
-        NAME##_hash_desc,                                                                   \
-    }
+            {                                                                                       \
+                                                                                                    hash_key_src,                                                                       \
+                                                                                                    hash_key_len,                                                                       \
+                                                                                                    &NAME##_hash_code,                                                                  \
+                                                                                                    (hash_match_handler)&handler,                                                       \
+                                                                                                    NAME##_hash_desc,                                                                   \
+            }
 #else
 /* use va_args to adapt from codes which has HASH_MATCH_SAVE_DESC enabled. */
 #define HASH_MATCH_EXPORT(GROUP, NAME, hash_key_src, hash_key_len, handler, ...)            \
     static uint32_t NAME##_hash_code = 0;                                                   \
     HASH_MATCH_USED const hash_match_t NAME HASH_MATCH_SECTION(#GROUP)=                     \
-    {                                                                                       \
-        hash_key_src,                                                                       \
-        hash_key_len,                                                                       \
-        &NAME##_hash_code,                                                                  \
-        &handler,                                                                           \
-    }
+            {                                                                                       \
+                                                                                                    hash_key_src,                                                                       \
+                                                                                                    hash_key_len,                                                                       \
+                                                                                                    &NAME##_hash_code,                                                                  \
+                                                                                                    (hash_match_handler)&handler,                                                       \
+            }
 #endif
 
 /* we do not use these functions directly, but use macro definitions functions instead. */
 extern void hash_match_group_init(const hash_match_t *start, const hash_match_t *end);
 
-extern void hash_match_group(const hash_match_t *start, const hash_match_t *end, const void *src, uint32_t len, void *param);
+extern void *hash_match_group(const hash_match_t *start, const hash_match_t *end, const void *src, uint32_t len, void *param);
 
 extern void hash_match_group_list(const hash_match_t *start, const hash_match_t *end);
 

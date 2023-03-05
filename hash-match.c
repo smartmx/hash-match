@@ -20,7 +20,7 @@
  *
  * @return None.
  */
-void hash_match_check(const hash_match_t *start, const hash_match_t *end, uint32_t hash_code)
+void hash_match_check(const hash_match_t *start, const hash_match_t *end, uint32_t hash_code, uint32_t hash_key_len)
 {
     const hash_match_t *check_start = (const hash_match_t *)start;
     HASH_MATCH_PRINTF("check hash_code:'%08x'\n", hash_code);
@@ -32,8 +32,24 @@ void hash_match_check(const hash_match_t *start, const hash_match_t *end, uint32
         }
         if (*(check_start->hash_code) == hash_code)
         {
-            HASH_MATCH_PRINTF("hash match check error, hash_code %08x is duplicated!\n", (uint32_t)check_start);
-            break;
+            HASH_MATCH_PRINTF("hash_code is duplicated with hash_key:\n");
+            HASH_MATCH_PRINTF("1st:");
+            for (uint32_t i = 0; i < check_start->hash_key_len; i++)
+            {
+                HASH_MATCH_PRINTF(" %02x", check_start->hash_key_src[i]);
+            }
+            HASH_MATCH_PRINTF("\n");
+            HASH_MATCH_PRINTF("2nd:");
+            for (uint32_t i = 0; i < end->hash_key_len; i++)
+            {
+                HASH_MATCH_PRINTF(" %02x", end->hash_key_src[i]);
+            }
+            HASH_MATCH_PRINTF("\n");
+            if (check_start->hash_key_len == hash_key_len)
+            {
+                HASH_MATCH_PRINTF("hash_code and hash_key_len %d are all duplicated, you must fix it!\n", hash_key_len);
+                break;
+            }
         }
         check_start++;
     }
@@ -58,7 +74,7 @@ void hash_match_group_init(const hash_match_t *start, const hash_match_t *end)
         }
         *(init_start->hash_code) = hash_match_caculate(init_start->hash_key_src, init_start->hash_key_len);
 #if HASH_MATCH_INIT_CHECK
-        hash_match_check(start, init_start, *(init_start->hash_code));
+        hash_match_check(start, init_start, *(init_start->hash_code), init_start->hash_key_len);
 #endif
         init_start++;
     }
@@ -76,7 +92,7 @@ void hash_match_group_init(const hash_match_t *start, const hash_match_t *end)
  *
  * @return None.
  */
-void* hash_match_group(const hash_match_t *start, const hash_match_t *end, const void *src, uint32_t len, void *param)
+void *hash_match_group(const hash_match_t *start, const hash_match_t *end, const void *src, uint32_t len, void *param)
 {
     const hash_match_t *find_start = (const hash_match_t *)start;
     uint32_t hash_code;
@@ -97,7 +113,7 @@ void* hash_match_group(const hash_match_t *start, const hash_match_t *end, const
                 {
                     find_start->handler(param);
                 }
-                return find_start;
+                return (void *)find_start;
 #if HASH_MATCH_COMPARE_KEY
             }
 #endif

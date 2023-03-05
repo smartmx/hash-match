@@ -16,13 +16,19 @@
 
 ## HASH算法
 
-hash-match库中提供了一种哈希算法：[Murmurhash3](https://github.com/aappleby/smhasher)
+hash-match库中提供了两种哈希算法：
+
+### [Murmurhash3](https://github.com/aappleby/smhasher)
 
 MurmurHash是一种非加密函数的哈希函数，它能够产生出32-bit或128-bit哈希值。自称超级快的hash算法，是FNV的4-5倍。
 
 MurmurHash算法由Austin Appleby创建于2008年，现已应用到Hadoop、libstdc 、nginx、libmemcached,Redis，Memcached，Cassandra，HBase，Lucene等开源系统。
 
 用户可以移植其他匹配算法，通过更改`hash_match_caculate`宏定义决定使用哪一种。
+
+### Simplehash
+
+Simplehash是一种非常简单的哈希函数，它能够产生出32-bit哈希值。运行速度很快，更适合低速单片机使用。
 
 ## 使用方法
 
@@ -215,6 +221,52 @@ PROVIDE(hash_match_test_end = .);
 `murmurhash3_upper_caculate32`函数会将小写字母转换为大写字母再进行哈希值计算
 
 `murmurhash3_lower_char_upper_memcmp`函数会将小写字母转换为大写字母后再比较是否相同
+
+## 通过宏定义来简化定义过程
+
+例如，你现在打算为每个AT指令创建函数，可以在头文件中增加如下宏定义：
+
+```c
+#define _AT_HASH_MATCH_EXPORT(A, B)         static void A##_handler(at_uart_data_t *p);                             \
+                                            HASH_MATCH_EXPORT(uart_at_cmd, A, B, (sizeof(B) - 1), A##_handler);     \
+                                            static void A##_handler(at_uart_data_t *p)
+
+#define AT_HASH_MATCH_EXPORT(X)             _AT_HASH_MATCH_EXPORT(at_##X, #X)
+```
+
+那么就可以在c文件里很快的定义出函数：
+
+```c
+/*
+ * AT+CONNECT命令，启用连接
+ */
+AT_HASH_MATCH_EXPORT(connect)
+{
+    printf("+CONNECT:1" "\r\nOK\r\n");
+}
+```
+
+上述函数展开后：
+
+```c
+/*
+ * AT+CONNECT命令，启用连接
+ */
+static void at_connect_handler(at_uart_data_t *p);
+static uint32_t at_connect_hash_code = 0;
+__attribute__((used)) const hash_match_t at_connect __attribute__((section("uart_at_cmd"))) =
+{
+    "connect",
+    (sizeof("connect") - 1),
+    &at_connect_hash_code,
+    (hash_match_handler) &at_connect_handler,
+};
+
+static void at_connect_handler(at_uart_data_t *p)
+{
+    printf("+CONNECT:1" "\r\nOK\r\n");
+}
+```
 
 ## 注意事项
 
