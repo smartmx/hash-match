@@ -65,24 +65,24 @@ typedef struct _hash_match_struct
     static const char NAME##_hash_desc[] = hash_desc;                                       \
     static uint32_t NAME##_hash_code = 0;                                                   \
     HASH_MATCH_USED const hash_match_t NAME HASH_MATCH_SECTION(#GROUP)=                     \
-            {                                                                                       \
-                                                                                                    hash_key_src,                                                                       \
-                                                                                                    hash_key_len,                                                                       \
-                                                                                                    &NAME##_hash_code,                                                                  \
-                                                                                                    (hash_match_handler)&handler,                                                       \
-                                                                                                    NAME##_hash_desc,                                                                   \
-            }
+    {                                                                                       \
+        hash_key_src,                                                                       \
+        hash_key_len,                                                                       \
+        &NAME##_hash_code,                                                                  \
+        (hash_match_handler)&handler,                                                       \
+        NAME##_hash_desc,                                                                   \
+    }
 #else
 /* use va_args to adapt from codes which has HASH_MATCH_SAVE_DESC enabled. */
 #define HASH_MATCH_EXPORT(GROUP, NAME, hash_key_src, hash_key_len, handler, ...)            \
     static uint32_t NAME##_hash_code = 0;                                                   \
     HASH_MATCH_USED const hash_match_t NAME HASH_MATCH_SECTION(#GROUP)=                     \
-            {                                                                                       \
-                                                                                                    hash_key_src,                                                                       \
-                                                                                                    hash_key_len,                                                                       \
-                                                                                                    &NAME##_hash_code,                                                                  \
-                                                                                                    (hash_match_handler)&handler,                                                       \
-            }
+    {                                                                                       \
+        hash_key_src,                                                                       \
+        hash_key_len,                                                                       \
+        &NAME##_hash_code,                                                                  \
+        (hash_match_handler)&handler,                                                       \
+    }
 #endif
 
 /* we do not use these functions directly, but use macro definitions functions instead. */
