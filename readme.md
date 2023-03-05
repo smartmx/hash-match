@@ -113,20 +113,22 @@ PROVIDE(hash_match_test_end = .);
     *(.glue_7)
     *(.glue_7t)
     *(.gnu.linkonce.t.*)
-    . = ALIGN(4);
-
+    
     /* this is for GROUP hash_match_test of hash_match library. */
+    . = ALIGN(4);
     PROVIDE(hash_match_test_start = .);
     KEEP(*(hash_match_test))
-    PROVIDE(hash_match_test_end = .);
     . = ALIGN(4);
-
+    PROVIDE(hash_match_test_end = .);
+    
     /* this is for GROUP hash_match_test1 of hash_match library. */
+    . = ALIGN(4);
     PROVIDE(hash_match_test1_start = .);
     KEEP(*(hash_match_test))
-    PROVIDE(hash_match_test1_end = .);
     . = ALIGN(4);
+    PROVIDE(hash_match_test1_end = .);
 
+    . = ALIGN(4);
 } >FLASH AT>FLASH 
 ```
 
