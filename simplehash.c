@@ -8,6 +8,10 @@
  * 2023-03-03     smartmx      the first version
  *
  */
+/*
+ * @Note:
+ * This simple hash algorithm comes from: https://github.com/jiejieTop/cmd-parser.
+ */
 #include "simplehash.h"
 
 /**

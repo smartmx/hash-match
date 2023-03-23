@@ -30,6 +30,8 @@ MurmurHash算法由Austin Appleby创建于2008年，现已应用到Hadoop、libs
 
 Simplehash是一种非常简单的哈希函数，它能够产生出32-bit哈希值。运行速度很快，更适合低速单片机使用。
 
+Simplehash算法是参考[cmd-parser](https://github.com/jiejieTop/cmd-parser)。
+
 ## 使用方法
 
 库中头文件参照了rt-thread中针对不同的编译器设置了不同的宏定义，目前支持MDK、IAR和GNU gcc。其他编译器暂未移植，一般来说已经满足使用。如果有其他编译器需求，请自行移植。
